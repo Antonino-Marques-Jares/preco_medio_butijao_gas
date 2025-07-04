@@ -7,7 +7,7 @@
   Crie as pastas csv e csv_resumo
 
 ## Passo 2:
-  Baixe os dataset's do **GLP** em [Série Histórica de Preços de Combustíveis e de GLP](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
+  Baixe os dataset's do **GLP** em [Dados Abertos - Série Histórica de Preços de Combustíveis e de GLP](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
   1º e 2º Semestre dos anos 2004 a 2024 (total de 42 arquivos csv) e salvando todos na pasta csv.
   
 
