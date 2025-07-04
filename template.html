@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Preços de Combustíveis por UF</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.3.0/dist/chartjs-plugin-annotation.min.js"></script>
+            <style>
+                
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #000;
+        }
+        .chart-container {
+            height: 500px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            position: relative;
+        }
+        select{
+            width: 12px;
+            height: 200px;
+        } 
+        button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .uf {
+            display: flex;
+            flex: left;
+            gap: 10px;
+            margin-top: 15px;
+            position: relative;
+            padding-bottom: 50px;
+            min-height: 150px;
+            width:auto;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            box-shadow: 0 1px 2px #000;
+            white-space: nowrap;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+        }
+        .product-tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .product-tab {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+        .product-tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #ufFilter {
+            width: 50px;
+            min-height: 100px;
+        }
+        .event-tooltip {
+            position: absolute;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 280px;
+            font-size: 14px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            border-left: 3px solid;
+            transition: opacity 0.2s;
+        }
+
+        .event-tooltip::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -10px;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+        }
+        .event-tooltip strong {
+            color: #ffcc00;
+        }
+        .event-tooltip em {
+            color: #730303;
+            font-size: 22px;
+        }
+        .event-card {
+            margin: 10px 0;
+            padding: 15px;
+            border-left: 4px solid #9966ff;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .event-card .event-date {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .event-card .event-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .event-card .event-description {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .event-card .event-impact {
+            font-size: 14px;
+            color: #555;
+        }
+        .grupo {
+            top: 15px;
+            padding: 8px 16px;
+            right: 15px;
+            display: flex;
+            background-color: #edebab;
+            margin:15px;
+            
+        }
+        .zoom-buttons {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 5px;
+        }
+        .zoom-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            padding:15px;
+        }
+        .zoom-button:hover {
+            background-color: #45a049;
+        }
+        .nav-buttons {
+            position: absolute;
+            top: 60px;
+            right: 60px;
+            display: flex;
+            gap: 5px;
+            padding:15px;
+        }
+        .nav-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .nav-button:hover {
+            background-color: #0b7dda;
+        }
+        .filter-section {
+            margin-top: 50px;
+        }
+        #applyFilter{
+            height:50px;
+            padding:15px;
+            margin:15px;
+        }
+        .grupo {
+            top: 15px;
+            padding: 8px 16px;
+            right: 15px;
+            display: flex;
+            background-color: #edebab;
+            margin:15px;
+            
+        }
+    
+            </style>
+        </head>
+        <body>
+             
+    <div class="container">
+        <h1>Histórico de preço médio do butijão de gás de 13kg por Estado</h1>
+
+        <div class="product-tabs" id="productTabs">
+            <div class="product-tab active" data-product="GLP">GLP</div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-section">
+                <div class="uf">
+                    <label for="ufFilter">Filtrar UFs:</label>
+                    <select id="ufFilter" multiple>
+                        <!-- As opções serão preenchidas pelo JavaScript -->
+                    </select>
+                    <button id="applyFilter" style="width: 100px; height: 50px; font-size: 14px;">Aplicar Filtro</button>
+                </div>
+                <div class="legend" id="chartLegend"></div>
+            </div>
+
+            <div class="grupo">
+                <button class="nav-button" id="navLeft" onclick="navigateLeft()">←</button>
+                <button class="nav-button" id="navRight" onclick="navigateRight()">→</button>
+            </div>
+            
+            <div class="grupo">
+                <button class="zoom-button" id="zoomIn">+</button>
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="resetZoom">⟲</button>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+
+        <div class="events-panel">
+            <div id="eventsContainer">
+                <!-- Os eventos serão inseridos aqui pelo JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+            <script>
+                 
+    // Dados serão injetados aqui
+    const fuelData = {};
+
+    // Variáveis globais
+    let priceChart;
+    let currentProduct = 'GLP';
+    let visibleRange = 6;
+
+    // Inicializar controles
+    function initializeControls() {
+        // Inicializar tabs de produtos
+        document.querySelectorAll('.product-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentProduct = this.dataset.product;
+                updateChart();
+            });
+        });
+
+        // Inicializar seletor de UFs
+        const ufFilter = document.getElementById('ufFilter');
+        if (ufFilter.children.length === 0) {
+            const ufs = [...new Set([
+                ...fuelData.GLP.datasets.map(d => d.uf)
+            ])].sort();
+            
+            ufs.forEach(uf => {
+                const option = document.createElement('option');
+                option.value = uf;
+                option.textContent = uf;
+                option.selected = true;
+                ufFilter.appendChild(option);
+            });
+        }
+
+        // Configurar botão de filtro
+        document.getElementById('applyFilter').addEventListener('click', updateChart);
+        
+        // Configurar botões de zoom
+        document.getElementById('zoomIn').addEventListener('click', zoomIn);
+        document.getElementById('zoomOut').addEventListener('click', zoomOut);
+        document.getElementById('resetZoom').addEventListener('click', resetZoom);
+        
+        // Configurar botões de navegação
+        document.getElementById('navLeft').addEventListener('click', navigateLeft);
+        document.getElementById('navRight').addEventListener('click', navigateRight);
+    }
+
+    // Funções de zoom
+    function zoomIn() {
+        if (!priceChart) return;
+        
+        const xAxis = priceChart.options.scales.x;
+        if (!xAxis) return;
+        
+        if (xAxis.min === undefined || xAxis.max === undefined) {
+            xAxis.min = 0;
+            xAxis.max = Math.min(visibleRange, priceChart.data.labels.length - 1);
+        }
+        
+        const range = xAxis.max - xAxis.min;
+        const newRange = Math.max(2, range * 0.7);
+        
+        const center = xAxis.min + range / 2;
+        xAxis.min = Math.max(0, center - newRange / 2);
+        xAxis.max = Math.min(priceChart.data.labels.length - 1, center + newRange / 2);
+        
+        priceChart.update();
+    }
+
+    function zoomOut() {
+        if (!priceChart) return;
+        
+        const xAxis = priceChart.options.scales.x;
+        if (!xAxis) return;
+        
+        if (xAxis.min === undefined || xAxis.max === undefined) return;
+        
+        const range = xAxis.max - xAxis.min;
+        const newRange = range * 1.3;
+        const center = xAxis.min + range / 2;
+        
+        xAxis.min = Math.max(0, center - newRange / 2);
+        xAxis.max = Math.min(priceChart.data.labels.length - 1, center + newRange / 2);
+        
+        if (xAxis.max - xAxis.min >= priceChart.data.labels.length) {
+            resetZoom();
+            return;
+        }
+        
+        priceChart.update();
+    }
+
+    // Reset Zoom - Mostrar todo o período
+    function resetZoom() {
+        if (!priceChart) return;
+        
+        const xAxis = priceChart.options.scales.x;
+        if (!xAxis) return;
+        
+        // Resetar para mostrar todo o período
+        xAxis.min = undefined;
+        xAxis.max = undefined;
+        priceChart.update();
+    }
+
+    // Funções de navegação
+    function navigateLeft() {
+        if (!priceChart) return;
+        
+        const xAxis = priceChart.options.scales.x;
+        if (!xAxis) return;
+        
+        // Se não há zoom aplicado, não faz nada
+        if (xAxis.min === undefined || xAxis.max === undefined) {
+            return;
+        }
+        
+        const range = xAxis.max - xAxis.min;
+        const step = Math.max(1, Math.floor(range * 0.3)); // Ajuste o passo aqui (30% do range)
+        
+        // Calcula os novos limites
+        let newMin = xAxis.min - step;
+        let newMax = xAxis.max - step;
+        
+        // Verifica os limites do gráfico
+        if (newMin < 0) {
+            newMin = 0;
+            newMax = range;
+        }
+        
+        // Aplica os novos valores
+        xAxis.min = newMin;
+        xAxis.max = newMax;
+        
+        priceChart.update();
+    }
+
+    function navigateRight() {
+        if (!priceChart) return;
+        
+        const xAxis = priceChart.options.scales.x;
+        if (!xAxis) return;
+        
+        // Se não há zoom aplicado, não faz nada
+        if (xAxis.min === undefined || xAxis.max === undefined) {
+            return;
+        }
+        
+        const range = xAxis.max - xAxis.min;
+        const step = Math.max(1, Math.floor(range * 0.3)); // Ajuste o passo aqui (30% do range)
+        const maxIndex = priceChart.data.labels.length - 1;
+        
+        // Calcula os novos limites
+        let newMin = xAxis.min + step;
+        let newMax = xAxis.max + step;
+        
+        // Verifica os limites do gráfico
+        if (newMax > maxIndex) {
+            newMax = maxIndex;
+            newMin = maxIndex - range;
+        }
+        
+        // Aplica os novos valores
+        xAxis.min = newMin;
+        xAxis.max = newMax;
+        
+        priceChart.update();
+    }
+
+    function updateChart() {
+        const selectedUFs = Array.from(document.getElementById('ufFilter').selectedOptions)
+            .map(option => option.value);
+        
+        const currentData = fuelData[currentProduct];
+        const filteredDatasets = currentData.datasets.filter(d => selectedUFs.includes(d.uf));
+        
+        if (priceChart) {
+            priceChart.destroy();
+        }
+        
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        
+        // Configurar anotações para os eventos
+        const eventAnnotations = fuelData.EVENTS.map(event => {
+            const eventIndex = currentData.labels.indexOf(event.date);
+            if (eventIndex === -1) return null;
+
+            return {
+                type: 'line',
+                mode: 'vertical',
+                scaleID: 'x',
+                value: eventIndex,
+                borderColor: getImpactColor(event.impact),
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                    content: event.title,
+                    enabled: true,
+                    position: 'top',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    color: '#fff',
+                    font: {
+                        size: 10
+                    },
+                    rotation: 0,
+                    xAdjust: 0,
+                    yAdjust: -20
+                }
+            };
+        }).filter(annotation => annotation !== null);
+        
+        // Função auxiliar para cores baseadas no impacto
+        function getImpactColor(impact) {
+            const colors = {
+                'alto': 'rgba(255, 99, 132, 0.7)',
+                'médio': 'rgba(255, 159, 64, 0.7)',
+                'baixo': 'rgba(75, 192, 192, 0.7)'
+            };
+            return colors[impact.toLowerCase()] || 'rgba(153, 102, 255, 0.7)';
+        }
+        
+        priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: currentData.labels,
+                datasets: filteredDatasets.map(dataset => ({
+                    label: dataset.label,
+                    data: dataset.data,
+                    borderColor: dataset.borderColor,
+                    backgroundColor: dataset.backgroundColor,
+                    borderWidth: 2,
+                    tension: 0.1
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Preço (R$/13kg)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Período'
+                        },
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                },
+                plugins: {
+                    annotation: {
+                        annotations: eventAnnotations
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        updateLegend(filteredDatasets);
+        addEventTooltips();
+    }
+
+    // Atualizar legenda personalizada
+    function updateLegend(datasets) {
+        const legendContainer = document.getElementById('chartLegend');
+        legendContainer.innerHTML = '';
+        
+        datasets.forEach((dataset, index) => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            const colorBox = document.createElement('div');
+            colorBox.className = 'legend-color';
+            colorBox.style.backgroundColor = dataset.borderColor;
+            
+            const label = document.createElement('span');
+            label.textContent = dataset.label;
+            
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(label);
+            
+            legendItem.addEventListener('click', () => {
+                const meta = priceChart.getDatasetMeta(index);
+                meta.hidden = !meta.hidden;
+                priceChart.update();
+                legendItem.style.opacity = meta.hidden ? '0.5' : '1';
+            });
+            
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    function addEventTooltips() {
+        const chartCanvas = document.getElementById('priceChart');
+        const eventTooltip = document.createElement('div');
+        eventTooltip.className = 'event-tooltip';
+        eventTooltip.style.position = 'absolute';
+        eventTooltip.style.padding = '8px';
+        eventTooltip.style.background = 'rgba(0, 0, 0, 0.8)';
+        eventTooltip.style.color = 'white';
+        eventTooltip.style.borderRadius = '4px';
+        eventTooltip.style.pointerEvents = 'none';
+        eventTooltip.style.display = 'none';
+        eventTooltip.style.zIndex = '100';
+        chartCanvas.parentNode.appendChild(eventTooltip);
+
+        chartCanvas.addEventListener('mousemove', function(e) {
+            const rect = chartCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const activeEvent = fuelData.EVENTS.find(event => {
+                const eventIndex = fuelData[currentProduct].labels.indexOf(event.date);
+                if (eventIndex === -1) return false;
+                
+                const point = priceChart.scales.x.getPixelForValue(eventIndex);
+                return Math.abs(x - point) < 10;
+            });
+            
+            if (activeEvent) {
+                eventTooltip.style.display = 'block';
+                eventTooltip.style.left = `${e.clientX + 10}px`;
+                eventTooltip.style.top = `${e.clientY + 10}px`;
+                eventTooltip.innerHTML = `
+                <div style="font-size: 20px;">${activeEvent.title}</div>
+                <div style="color: #aaa; margin-bottom: 8px;">${activeEvent.date}</div>
+                <div style="margin-bottom: 8px;">${activeEvent.description}</div>
+                <em style="color: ${getImpactColor(activeEvent.impact)};">Impacto: ${activeEvent.impact}</em>
+            `;
+            } else {
+                eventTooltip.style.display = 'none';
+            }
+        });
+        
+        chartCanvas.addEventListener('mouseout', function() {
+            eventTooltip.style.display = 'none';
+        });
+    }
+
+    function displayEvents() {
+        const eventsContainer = document.getElementById('eventsContainer');
+        eventsContainer.innerHTML = '<h2>Eventos Relevantes</h2>';
+
+        if (!fuelData.EVENTS || fuelData.EVENTS.length === 0) {
+            eventsContainer.innerHTML += '<p>Nenhum evento encontrado.</p>';
+            return;
+        }
+
+        // Ordenar eventos do mais recente para o mais antigo
+        const sortedEvents = [...fuelData.EVENTS].sort((a, b) => {
+            const [aMonth, aYear] = a.date.split('/').map(Number);
+            const [bMonth, bYear] = b.date.split('/').map(Number);
+            return new Date(bYear, bMonth - 1) - new Date(aYear, aMonth - 1);
+        });
+
+        sortedEvents.forEach(event => {
+            const impactColor = getImpactColor(event.impact);
+            
+            const eventCard = document.createElement('div');
+            eventCard.className = 'event-card';
+            eventCard.style.cssText = `
+                margin: 10px 0px;
+                padding: 15px;
+                border-left: 4px solid ${impactColor};
+                background-color: #f9f9f9;
+                border-radius: 4px;
+                box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px;
+            `;
+            
+            eventCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="font-weight: bold; color: ${impactColor};">
+                        ${event.title}
+                    </div>
+                    <div style="color: #666;">
+                        ${event.date}
+                    </div>
+                </div>
+                <div style="margin-bottom: 8px; color: #333;">
+                    ${event.description}
+                </div>
+                <div style="font-size: 14px; color: #555;">
+                    <strong>Impacto:</strong> ${event.impact}
+                </div>
+            `;
+            
+            eventsContainer.appendChild(eventCard);
+        });
+    }
+
+    function getImpactColor(impact) {
+        impact = (impact || '').toLowerCase();
+        if (impact.includes('alto')) return '#ff6384';
+        if (impact.includes('médio') || impact.includes('medio')) return '#ff9f40';
+        if (impact.includes('baixo')) return '#4bc0c0';
+        return '#9966ff';
+    }
+
+    // Função auxiliar para determinar a cor com base no impacto
+    function getImpactColor(impact) {
+        impact = (impact || '').toLowerCase();
+        if (impact.includes('alto')) return '#ff6384';
+        if (impact.includes('médio') || impact.includes('medio')) return '#ff9f40';
+        if (impact.includes('baixo')) return '#4bc0c0';
+        return '#9966ff';
+    }
+
+    // Inicializar a página
+    window.onload = function() {
+        initializeControls();
+        updateChart();
+        displayEvents();
+    };
+
+            </script>
+        </body>
+        </html>
+        
