@@ -41,7 +41,7 @@
   Com este resumo criamos ao final um html que exibe o gráfico do preço médio.
 
 # Fonte:
-[Dados Abertos - GLP](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
+[![Gov Br](govbr.webp)](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
 
 # Dados acessados em: 
 29/06/2025
