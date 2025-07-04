@@ -41,10 +41,10 @@
   Com este resumo criamos ao final um html que exibe o gráfico do preço médio.
 
 # Fonte:
-[Dados Abertos](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
+[Dados Abertos - GLP](https://dados.gov.br/dados/conjuntos-dados/serie-historica-de-precos-de-combustiveis-e-de-glp)
 
 # Dados acessados em: 
 29/06/2025
 
 # Visualize o resultado em: 
-[Área de Trampo](https://www.areadetrampo.com.br/preco-medio-de-combustiveis-2004-a-2024-e-eventos-relevantes/)
+[Área de Trampo - Preço médio do butijão de gás de 13kg](https://www.areadetrampo.com.br/preco-medio-de-combustiveis-2004-a-2024-e-eventos-relevantes/)
